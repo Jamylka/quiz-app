@@ -1,8 +1,21 @@
-/* Your styles should be mobile-first and responsive */
 
-/** 
-  * If you are unclear on how to utilize a mobile-first, responsive technique to write your CSS, here is an example: 
-  *
-  * https://github.com/andreacardybailey/responsive_example/blob/master/styles/responsive-base.css 
-  *
-*/
+    .mainPage {
+        margin: 45px;
+        border: 1px solid #690350;
+        background-color: pink;
+        padding: 30px;
+        text-align: center;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    .finalPage {
+        margin: 45px;
+        border: 1px solid #690350;
+        background-color: pink;
+        padding: 30px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+    }
