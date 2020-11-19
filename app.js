@@ -61,10 +61,11 @@ const store = {
             incorrect: "Uh-oh, not quite. The correct answer was, Poodle."
         },
     ],
-    feedback: "",
     quizStarted: false,
     questionNumber: 0,
     score: 0,
+    currentAnswer: '',
+    feedbackGiven: true
 };
 //home page//
 function generateMainPage() { 
@@ -94,16 +95,45 @@ function generateQuestion() {
             <h2>Question ${store.questionNumber + 1} of 5</h2>
             <p>${question.question}</p>
             ${answers.join("")}
-            <button type="submit">Submit Answer</button> 
-            <p class="">${store.feedback}</p>
+            <button type="submit">Submit Answer</button>
         </form>
         </div>
     `
 }    
 
+//feeback page
+function generateFeedbackPage() {
+    //display feedback
+    let feedback = '';
+    if (store.currentAnswer === store.questions[store.questionNumber].correctAnswer) {
+        feedback = store.questions[store.questionNumber].correct;
+    } else {
+        feedback = store.questions[store.questionNumber].incorrect;
+    }
+    return `<div class="mainPage">
+    <form id="nextQuestion">
+    <div class = "keepScore"> Score:${store.score} of 5</div>
+        <h2>Question ${store.questionNumber + 1} of 5</h2>
+        <p>${store.questions[store.questionNumber].question}</p>
+        <p class="">${feedback}</p>
+        <button type="submit">Next Question</button> 
+    </form>
+    </div>
+    `
+}
+
 //end page//
 function generateFinalPage() { 
+    let feedback = '';
+    if (store.currentAnswer === store.questions[store.questionNumber].correctAnswer) {
+        feedback = store.questions[store.questionNumber].correct;
+    } else {
+        feedback = store.questions[store.questionNumber].incorrect;
+    }
     return `<div class="mainPage">
+        <h2>Question ${store.questionNumber + 1} of 5</h2>
+        <p>${store.questions[store.questionNumber].question}</p>
+        <p class="">${feedback}</p>
         <h2>Congrats, you have reached the end!</h2>
         <p>Final Score: ${store.score} out of 5</p>
         <button id="restartQuiz">Restart Quiz</button>
@@ -113,7 +143,7 @@ function generateFinalPage() {
     
 //will start the quiz//
 function handleStartQuiz(){
-   $('main').on('click', '#startQuiz', function(_event){
+   $('main').on('click', '#startQuiz', function(event){
        store.quizStarted = true;
        render();
        console.log(handleStartQuiz)
@@ -121,22 +151,31 @@ function handleStartQuiz(){
 
 }
 
+
+function handleNextQuestion() {
+    $('main').on('submit', '#nextQuestion', function (event) {
+        event.preventDefault();  
+        store.feedbackGiven = true;
+        store.currentAnswer = '';
+        store.questionNumber++;
+        render();
+    });
+}
+
+
 //after user submits answer//
 function handleAnswerSubmit(){
     $('main').on('submit', '#question', function (event) {
         event.preventDefault(); 
-    let chosenAnswer = $("input[name='answer']:checked").val();
-        console.log(chosenAnswer);
-     if (chosenAnswer === store.questions[store.questionNumber].correctAnswer){
+    store.currentAnswer = $("input[name='answer']:checked").val();
+        console.log(store.currentAnswer);
+        store.feedbackGiven = false;
+     if (store.currentAnswer === store.questions[store.questionNumber].correctAnswer){
          //return correct
-         store.feedback = store.questions[store.questionNumber].correct ;
          console.log(`true`);
          store.score++;
       // return incorrect
-    } else {
-    store.feedback = store.questions[store.questionNumber].incorrect;
     }
-    store.questionNumber++;
      render();
 });
 }
@@ -146,34 +185,82 @@ function handleAnswerSubmit(){
     function handleRestartQuiz(){
         $('main').on('click', '#restartQuiz', function (_event) {
             store.quizStarted = false;
+            store.feedbackGiven = true;
+            store.currentAnswer = '';
+            store.score = 0;
+            store.questionNumber = 0;
             render();
-            location.reload()
             console.log(handleRestartQuiz)
         })
     }
-
-
-
+    
+    
+    
     function render() {
-        let html = '';
-    if (store.quizStarted) {
-        if(store.questionNumber === store.questions.length){
-        html = generateFinalPage()
-          } else {
-        html = generateQuestion();
-        }
-        } else {
+    let html = '';
+    if (store.quizStarted === false) {
         html = generateMainPage();
+    } else if  (store.feedbackGiven === true) {
+        html = generateQuestion();
+    } else if (store.feedbackGiven === false && store.questionNumber === store.questions.length -1) {
+        html = generateFinalPage();
+    } else {  
+        html = generateFeedbackPage();
+}
+    $('main').html(html);
     }
-        $('main').html(html);
-      }
+
+
+
+
+
+
+    // function render() {
+    //     let html = '';
+    //     if (store.quizStarted) {
+    //     if(store.questionNumber === store.questions.length){
+    //     html = generateFinalPage()
+    //       } else {
+    //     html = generateQuestion();
+    //     }
+    //     } else {
+    //     html = generateMainPage();
+    // }
+    //     $('main').html(html);
+    //   }
 
 function main() {
     render();
     handleStartQuiz();
     handleAnswerSubmit();
     handleRestartQuiz();
+    handleNextQuestion();
+
 }
 $(main);
 
-   
+    
+    /**
+     * 
+     * Technical requirements:
+     * 
+     * Your app should include a render() function, that regenerates the view each time the store is updated. 
+     * See your course material and access support for more details.
+     *
+     * NO additional HTML elements should be added to the index.html file.
+     *
+     * You may add attributes (classes, ids, etc) to the existing HTML elements, or link stylesheets or additional scripts if necessary
+     *
+     * SEE BELOW FOR THE CATEGORIES OF THE TYPES OF FUNCTIONS YOU WILL BE CREATING 👇
+     * 
+     */
+
+    /********** TEMPLATE GENERATION FUNCTIONS **********/
+
+    // These functions return HTML templates
+
+    /********** RENDER FUNCTION(S) **********/
+
+    // This function conditionally replaces the contents of the <main> tag based on the state of the store
+
+    /********** EVENT HANDLER FUNCTIONS **********/
